@@ -50,7 +50,7 @@ def init_resources():
     print("initiallized resources")
 
 
-def reformulate_query(query: str, chat_history: list) -> str:
+def reformulate_query(query: str, chat_history: list, gemini_client) -> str:
     """
     If history exists, rewrite the query to be self-contained.
     If no history, return original query.
@@ -76,7 +76,7 @@ def reformulate_query(query: str, chat_history: list) -> str:
     """
     
     try:
-        response = client.models.generate_content(
+        response = gemini_client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
         )
@@ -89,19 +89,19 @@ def get_embedding(text: str):
     q_vec = model.encode(text, normalize_embeddings=True).tolist()
     return q_vec
 
-async def run_graph_strategy(user_query: str, chat_history: list) -> AsyncGenerator:
+async def run_graph_strategy(user_query: str, chat_history: list, gemini_client) -> AsyncGenerator:
     yield {"event": "status", "data": "Init"}
     
-    if client is None:
-        raise ValueError("Gemini Client is None! Init failed?")
+    if gemini_client is None:
+        raise ValueError("No Google API key provided. Please include your google_api_key in the request.")
     if qdrant_client is None:
         raise ValueError("Qdrant Client is None! Init failed?")
 
 
-    refined_query = reformulate_query(user_query, chat_history)
+    refined_query = reformulate_query(user_query, chat_history, gemini_client)
     
     # [FIX] Infer domain to restrict graph search
-    plan = await infer_filters(user_query, chat_history)
+    plan = await infer_filters(user_query, chat_history, gemini_client)
     
     # [Revert] Don't strict filter Qdrant initial query because Concepts might lack domain
     q_vec = get_embedding(refined_query)
@@ -262,7 +262,7 @@ class SearchPlan(BaseModel):
     search_text: str
     filters: List[SearchFilter]
 
-async def infer_filters(user_query: str, chat_history: list) -> SearchPlan:
+async def infer_filters(user_query: str, chat_history: list, gemini_client) -> SearchPlan:
     """Helper to infer domain/filters using Gemini."""
     history_str = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history]) if chat_history else "None"
     prompt = f"""
@@ -279,7 +279,7 @@ async def infer_filters(user_query: str, chat_history: list) -> SearchPlan:
       2. PREDICT THE DOMAIN. This is critical.
       3. Return NULL for others if unsure.
     """
-    resp = client.models.generate_content(
+    resp = gemini_client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
@@ -289,10 +289,10 @@ async def infer_filters(user_query: str, chat_history: list) -> SearchPlan:
     )
     return resp.parsed
 
-async def run_filter_strategy(user_query: str, chat_history: list) -> AsyncGenerator:
+async def run_filter_strategy(user_query: str, chat_history: list, gemini_client) -> AsyncGenerator:
     yield {"event": "status", "data": "Init"}
-    refined_query = reformulate_query(user_query, chat_history)
-    plan = await infer_filters(user_query, chat_history)
+    refined_query = reformulate_query(user_query, chat_history, gemini_client)
+    plan = await infer_filters(user_query, chat_history, gemini_client)
     
     yield {"event": "concepts", "data": [f"{f.field}:{f.value[0]}" for f in plan.filters]}
 

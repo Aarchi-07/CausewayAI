@@ -1,10 +1,12 @@
 import json
 import asyncio
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from google import genai
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -31,7 +33,8 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     query: str
     history: list = []
-    model_type: str = "graph" 
+    model_type: str = "graph"
+    google_api_key: str = ""  # User provides their own Gemini API key
 
 @app.get("/health")
 @limiter.limit("30/minute")
@@ -45,12 +48,21 @@ async def chat_endpoint(request: Request, req: ChatRequest):
     Streaming Endpoint.
     Returns: Server-Sent Events (SSE)
     """
+    # Resolve API key: user-provided key takes priority, fall back to server env var
+    api_key = req.google_api_key or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=400,
+            detail="No Google API key provided. Pass 'google_api_key' in your request body."
+        )
+    gemini_client = genai.Client(api_key=api_key)
+
     async def sse_generator():
         try:
             if req.model_type == "filter":
-                iterator = run_filter_strategy(req.query, req.history)
+                iterator = run_filter_strategy(req.query, req.history, gemini_client)
             else:
-                iterator = run_graph_strategy(req.query, req.history)
+                iterator = run_graph_strategy(req.query, req.history, gemini_client)
             
             # Stream Loop
             async for item in iterator:
