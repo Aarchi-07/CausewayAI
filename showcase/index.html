@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CausewayAI — Causal Intelligence at Scale</title>
+  <meta name="description" content="A dual-retrieval NLP system analyzing 30M+ customer support tokens using Vector RAG and GraphRAG with explainable, faithful outputs." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">CausewayAI</a>
+      <div class="nav-links">
+        <a href="#graph">Graph</a>
+        <a href="#explorer">Explorer</a>
+        <a href="#research">Research</a>
+        <a href="https://github.com" target="_blank" class="nav-cta">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <p class="hero-label">March 2026 — Inter IIT Tech Meet</p>
+      <h1 class="hero-title">Causal intelligence<br><em>at scale.</em></h1>
+      <p class="hero-sub">A dual-retrieval NLP engine that processes 30M+ conversational tokens, extracting structured, explainable insights through Vector RAG and GraphRAG — without hallucinating.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num" data-target="30">0</span><span class="stat-unit">M+</span>
+          <span class="stat-label">tokens analyzed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-target="88">0</span><span class="stat-unit">MB</span>
+          <span class="stat-label">knowledge graph</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-target="6">0</span><span class="stat-unit"></span>
+          <span class="stat-label">domains indexed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-target="74">0</span><span class="stat-unit">%</span>
+          <span class="stat-label">faithfulness score</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 01 — KNOWLEDGE GRAPH -->
+  <section id="graph">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <div>
+          <h2>Knowledge Graph</h2>
+          <p class="section-desc">An 88MB causal network encoding ~30,000 calls, 30M+ tokens, 6 domains, 29 topic clusters, and 28 outcome categories — linked by ~150K graph edges. What you see below is a fraction. <strong>Click any node to expand it</strong> and watch the data grow.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-stage">
+      <canvas id="graphCanvas"></canvas>
+      <div class="graph-overlay">
+        <div class="graph-legend">
+          <span class="legend-dot domain"></span>Domain
+          <span class="legend-dot concept"></span>Concept
+          <span class="legend-dot call"></span>Call
+        </div>
+        <div class="graph-fact" id="graphFact">Hover a node to explore</div>
+      </div>
+    </div>
+
+    <div class="container graph-meta">
+      <div class="graph-stat-row">
+        <div class="g-stat"><strong>~30K</strong><span>Total calls</span></div>
+        <div class="g-stat"><strong>30M+</strong><span>Tokens indexed</span></div>
+        <div class="g-stat"><strong>29</strong><span>Topic clusters</span></div>
+        <div class="g-stat"><strong>~150K</strong><span>Graph edges</span></div>
+      </div>
+      <p class="graph-caption" id="graphScaleNote">Click the Knowledge Corpus node to begin expanding the graph.</p>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 02 — VECTOR EXPLORER -->
+  <section id="explorer">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <div>
+          <h2>Vector Explorer</h2>
+          <p class="section-desc">The filter strategy uses Qdrant's hybrid prefilter — hard-matching domain, soft-matching topics and outcomes — then re-ranks by cosine similarity over 768-dim embeddings. The full corpus spans <strong>~30,000 calls · 30M+ tokens</strong> across 6 domains. Filter below to see how many records and tokens match your selection — only the top 20 are displayed.</p>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label for="f-domain">Domain</label>
+          <select id="f-domain">
+            <option value="">All domains</option>
+            <option>Banking</option>
+            <option>Flight</option>
+            <option>Hotel</option>
+            <option>Insurance</option>
+            <option>Retail</option>
+            <option>Telecom</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-topic">Topic</label>
+          <select id="f-topic">
+            <option value="">All topics</option>
+            <option>Booking Error</option>
+            <option>Cancellation Policy Inquiry</option>
+            <option>Connectivity Issue</option>
+            <option>Delivery Delay</option>
+            <option>Fee Dispute</option>
+            <option>Flight Delay</option>
+            <option>Flight Rebooking Request</option>
+            <option>Fraud Report</option>
+            <option>Incorrect Product Received</option>
+            <option>Loyalty Program Dissatisfaction</option>
+            <option>Plan/Service Upgrade Inquiry</option>
+            <option>Refund Request</option>
+            <option>Service Complaint</option>
+            <option>Service Dissatisfaction / Churn Risk</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="f-outcome">Outcome</label>
+          <select id="f-outcome">
+            <option value="">All outcomes</option>
+            <option>Billing Corrected</option>
+            <option>Cancellation Processed</option>
+            <option>Compensation Offered</option>
+            <option>Escalation Request</option>
+            <option>Fee Waived</option>
+            <option>Flight Rebooked</option>
+            <option>Information Provided</option>
+            <option>No Resolution</option>
+            <option>Refund Processed</option>
+            <option>Resolved via Troubleshooting</option>
+          </select>
+        </div>
+        <button id="filterBtn" onclick="runFilter()">Search corpus →</button>
+      </div>
+
+      <div id="filterStatus" class="filter-status" style="display:none;">
+        <span id="filterStatusText"></span>
+      </div>
+
+      <div id="callGrid" class="call-grid"></div>
+
+      <p class="explorer-note">Showing simulated retrieval results from the indexed corpus. All call IDs are real identifiers from the dataset.</p>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 03 — RESEARCH -->
+  <section id="research">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <div>
+          <h2>Research</h2>
+          <p class="section-desc">A system-level decision between two retrieval strategies — each optimizing for different properties. Neither is universally better; both are necessary.</p>
+        </div>
+      </div>
+
+      <!-- METRICS TABLE -->
+      <div class="metrics-block">
+        <h3>Evaluation results</h3>
+        <div class="metrics-grid">
+          <div class="metric-col">
+            <p class="metric-strategy">GraphRAG</p>
+            <div class="metric-row">
+              <span class="metric-name">Faithfulness</span>
+              <span class="metric-bar-wrap"><span class="metric-bar" data-w="74" style="background:#111;"></span></span>
+              <span class="metric-val">0.74</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">ID Recall</span>
+              <span class="metric-bar-wrap"><span class="metric-bar" data-w="30.8" style="background:#111;"></span></span>
+              <span class="metric-val">30.8%</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">Relevancy</span>
+              <span class="metric-bar-wrap"><span class="metric-bar" data-w="71" style="background:#111;"></span></span>
+              <span class="metric-val">0.71</span>
+            </div>
+          </div>
+          <div class="metric-col">
+            <p class="metric-strategy">Vector RAG</p>
+            <div class="metric-row">
+              <span class="metric-name">Faithfulness</span>
+              <span class="metric-bar-wrap"><span class="metric-bar" data-w="58" style="background:#888;"></span></span>
+              <span class="metric-val">0.58</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">ID Recall</span>
+              <span class="metric-bar-wrap"><span class="metric-bar" data-w="36.0" style="background:#888;"></span></span>
+              <span class="metric-val">36.0%</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">Relevancy</span>
+              <span class="metric-bar-wrap"><span class="metric-bar" data-w="77" style="background:#888;"></span></span>
+              <span class="metric-val">0.77</span>
+            </div>
+          </div>
+        </div>
+        <p class="metrics-note">Evaluated using RAGAS framework. GraphRAG favoured for compliance / root-cause analysis. Vector RAG favoured for general retrieval.</p>
+      </div>
+
+      <!-- ARCHITECTURE -->
+      <div class="arch-block">
+        <h3>Architecture</h3>
+        <div class="arch-diagram">
+          <div class="arch-row">
+            <div class="arch-box wide">User Query</div>
+          </div>
+          <div class="arch-arrows">↓</div>
+          <div class="arch-row split">
+            <div class="arch-box">Query Reformulation<span>Gemini 2.5 Flash</span></div>
+            <div class="arch-box">Filter Inference<span>JSON schema extraction</span></div>
+          </div>
+          <div class="arch-arrows">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓</div>
+          <div class="arch-row split">
+            <div class="arch-box highlight">GraphRAG<span>NetworkX traversal</span></div>
+            <div class="arch-box">Vector RAG<span>Qdrant + embeddinggemma</span></div>
+          </div>
+          <div class="arch-arrows">↓</div>
+          <div class="arch-row">
+            <div class="arch-box wide">Grounded LLM Answer + Citation<span>Gemini 2.5 Flash · SSE Stream</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METHODOLOGY -->
+      <div class="method-block">
+        <h3>Methodology</h3>
+        <div class="method-grid">
+          <div class="method-item">
+            <span class="method-num">I</span>
+            <div>
+              <strong>Two-stage label discovery</strong>
+              <p>40% sample → Gemini Pro discovers candidate topics/outcomes. Remaining 60% classified by Gemini Flash against fixed schema to prevent naming drift.</p>
+            </div>
+          </div>
+          <div class="method-item">
+            <span class="method-num">II</span>
+            <div>
+              <strong>Raw form preservation</strong>
+              <p>No stopword removal, lemmatization, or stemming. Conversational cues, hesitations, and agent phrasing carry signal — stripping them degrades classification.</p>
+            </div>
+          </div>
+          <div class="method-item">
+            <span class="method-num">III</span>
+            <div>
+              <strong>Hybrid retrieval decision</strong>
+              <p>Graph strategy: single-concept expansion, multi-concept intersection, shortest-path bridging. Vector strategy: must-match domain + should-match topic/outcome.</p>
+            </div>
+          </div>
+          <div class="method-item">
+            <span class="method-num">IV</span>
+            <div>
+              <strong>Faithfulness as guardrail</strong>
+              <p>GraphRAG's 0.74 faithfulness means near-zero hallucination risk. Critical for compliance and root-cause analysis where incorrect citations are dangerous.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEMO VIDEO -->
+      <div class="video-block" id="demo">
+        <h3>Demo</h3>
+        <div class="video-wrap">
+          <video controls poster="" id="demoVideo">
+            <source src="assets/demo.mp4" type="video/mp4" />
+            <div class="video-placeholder">
+              <p>Demo video — place <code>assets/demo.mp4</code> here</p>
+            </div>
+          </video>
+          <div class="video-placeholder-overlay" id="videoPlaceholder">
+            <div class="vp-inner">
+              <div class="play-icon">▶</div>
+              <p>System demo · ~3 min</p>
+              <p class="vp-sub">Showing query → graph traversal → streamed answer with Call ID citations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LINKS -->
+      <div class="links-block">
+        <h3>Links</h3>
+        <div class="links-row">
+          <a href="https://github.com" target="_blank" class="ext-link">GitHub repository ↗</a>
+          <a href="https://hub.docker.com" target="_blank" class="ext-link">Docker image ↗</a>
+          <a href="../Report.md" class="ext-link">Technical report ↗</a>
+          <a href="#" class="ext-link">GSoC 2026 proposal ↗</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-inner">
+      <span>CausewayAI — <em>Aarchi Kumari, Inter IIT Tech Meet 2026</em></span>
+      <div class="footer-links">
+        <a href="#">Home</a>
+        <a href="#research">Research</a>
+        <a href="mailto:">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/graph.js"></script>
+  <script src="js/explorer.js"></script>
+  <script src="js/research.js"></script>
+</body>
+</html>
