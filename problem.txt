@@ -1,0 +1,48 @@
+Here’s a clear breakdown of the problem statement, what is being asked, and the resources available so far — without mentioning any company names or confidential identifiers:
+
+---
+
+## 🌐 Problem Statement
+The challenge revolves around **analyzing large-scale conversational data** (like customer-agent dialogues) to identify **causal triggers** behind important business events such as:
+- Escalations to supervisors  
+- Refund requests  
+- Customer churn signals  
+
+The difficulty is that these events are not caused by a single obvious factor but by **patterns in dialogue** — hesitations, repeated queries, misunderstandings, silences, or branching flows. Current monitoring systems only flag that an event occurred but don’t explain *why*.  
+
+The goal is to build a system that can:
+- Ingest large volumes of transcripts (with speaker labels, turn indexing, timings).  
+- Detect and extract dialogue spans that causally contribute to events.  
+- Provide interpretable, evidence-based explanations.  
+- Enable analytic querying across the corpus (e.g., “What conversational patterns lead to escalations in billing discussions?”).  
+
+---
+
+## 📌 Tasks
+### **Task 1: Query-Driven Evidence-Based Causal Explanation**
+- Accept natural language queries like *“Why are escalations happening?”*.  
+- Generate structured causal explanations with supporting evidence from transcripts.  
+- Expected outcomes:
+  - ML system that outputs responses with evidential references.  
+  - Dataset of queries and system outputs.  
+  - Defined evaluation metrics for response quality.  
+
+### **Task 2: Conversational Follow-Up and Contextual Response Generation**
+- Extend Task 1 to support **iterative dialogue**.  
+- Handle follow-up questions while maintaining context.  
+- Expected outcomes similar to Task 1, but with conversational continuity.  
+
+---
+
+
+## 📂 Resources Available Now
+- **Problem statement document** (with detailed tasks, deliverables, evaluation philosophy).  
+- **Sample dataset** (actual dataset to be released later, on 15th November 2025).  
+- **Guidelines for submission** (dockerization, documentation, reproducibility).  
+- **Freedom to use LLMs** (open-source or proprietary, with recommendation to use embeddings/rerankers rather than heavy custom training unless justified).  
+
+---
+
+👉 In short: The problem is about moving from *outcome reporting* to *causal insight generation* in conversational data. The tasks require building a system that can explain why events happen and sustain iterative dialogue with users, supported by datasets, reports, and demos.  
+
+Would you like me to also **map out a step-by-step execution plan** (like milestones and timelines) based on these deliverables? That could help structure the work more practically.

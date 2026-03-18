@@ -30,8 +30,11 @@
   <p class="page-label">Technical report</p>
   <h1>Causal intelligence in large-scale<br>conversational data</h1>
 
-  <p class="page-date">March 2026</p>
-  <p class="page-authors">Aarchi Kumari</p>
+  <div class="page-meta">
+    <p class="page-date">March 2026</p>
+    <p class="page-authors">Aarchi Kumari</p>
+  </div>
+  <hr class="meta-rule">
 
   <a href="https://github.com/Aarchi-07/CausewayAI" class="cta-box" target="_blank">
     View on GitHub ↗
@@ -88,7 +91,7 @@
   <p>When a query arrives, we embed it using <code>embeddinggemma-300m</code> (768 dimensions) and run a vector search against the graph's embedding index to find initial entry nodes. A domain filter is inferred from the query and used to restrict which Call nodes are eligible. Then graph traversal begins.</p>
 
   <p>Three traversal modes handle different query structures:</p>
-  <ul style="font-size:15px;color:var(--grey-700);line-height:1.8;max-width:640px;padding-left:20px;margin-bottom:20px;">
+  <ul class="body-list">
     <li><strong>Single-concept expansion:</strong> retrieve all Call nodes adjacent to a single Concept node.</li>
     <li><strong>Multi-concept intersection:</strong> for queries involving multiple dimensions ("billing confusion AND escalation"), find Call nodes that appear in the neighbourhood of all relevant Concepts simultaneously.</li>
     <li><strong>Shortest-path bridging:</strong> when no intersection exists, find the minimum-length path between Concept nodes and extract Calls along the path — connecting structurally related regions of the graph.</li>
@@ -157,7 +160,7 @@
 
   <p>This is what the system is capable of doing, against a corpus no existing tool was processing analytically before:</p>
 
-  <ul style="font-size:15px;color:var(--grey-700);line-height:1.85;max-width:640px;padding-left:20px;margin-bottom:24px;">
+  <ul class="body-list">
     <li>Answer the question <em>"Why are escalations happening in banking calls?"</em> with citations to specific call IDs and quoted transcript spans.</li>
     <li>Perform multi-hop reasoning: "What connects fraud reports in insurance to churn signals in telecom?" — finding shared structural patterns via shortest-path graph traversal.</li>
     <li>Sustain multi-turn dialogue: follow-up questions maintain context without reprocessing the entire history.</li>
@@ -179,7 +182,7 @@
 
   <hr class="rule">
 
-  <p style="font-size:13px;color:var(--grey-400);">CausewayAI &mdash; <a href="https://github.com/Aarchi-07/CausewayAI" target="_blank">github.com/Aarchi-07/CausewayAI</a></p>
+  <p class="page-footer">CausewayAI &mdash; <a href="https://github.com/Aarchi-07/CausewayAI" target="_blank">github.com/Aarchi-07/CausewayAI</a></p>
 
 </main>
 
