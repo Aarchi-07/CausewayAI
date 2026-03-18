@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research — CausewayAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="9" height="9" rx="2" fill="#111"/><rect x="11" y="11" width="9" height="9" rx="2" fill="#111" opacity="0.4"/></svg>
+  </div>
+  <div class="sidebar-nav">
+    <a href="index.html">CausewayAI</a>
+    <a href="research.html" class="active">Research</a>
+    <a href="graph.html">Graph</a>
+    <a href="explorer.html">Explorer</a>
+    <div class="sidebar-divider"></div>
+    <a href="https://github.com/Aarchi-07/CausewayAI" target="_blank">GitHub ↗</a>
+    <a href="https://hub.docker.com" target="_blank">Docker ↗</a>
+  </div>
+</nav>
+
+<main id="content">
+
+  <p class="page-label">Technical report</p>
+  <h1>Causal intelligence in large-scale<br>conversational data</h1>
+
+  <p class="page-date">March 2026</p>
+  <p class="page-authors">Aarchi Kumari &mdash; Inter IIT Tech Meet</p>
+
+  <a href="https://github.com/Aarchi-07/CausewayAI" class="cta-box" target="_blank">
+    View on GitHub ↗
+  </a>
+
+  <p>How do you know <em>why</em> a customer escalated? Current systems know it happened — they have the outcome flag, the supervisor transfer, the ticket. But the conversation that produced it, the exact chain of turns that pushed the interaction to breaking point, remains opaque. Multiply this by thirty thousand conversations and thirty million tokens, and you have a blindspot at industrial scale.</p>
+
+  <p>This is the problem CausewayAI was built to solve. Not to report outcomes — to explain them. The system accepts natural-language queries against a large corpus of customer-agent transcripts and returns structured, evidence-backed causal explanations, citing specific call IDs and dialogue spans. It sustains multi-turn dialogue, handles follow-up questions with full context, and does this without hallucinating by grounding every claim in retrieved evidence.</p>
+
+  <hr class="rule">
+
+  <h2>Background</h2>
+
+  <p>Contact centre operations across industries — banking, insurance, retail, telecom, flight, hotel — share a structural problem: they produce enormous amounts of conversational data and extract very little analytical value from it beyond aggregate metrics. Escalation rate. Average handle time. CSAT score. These are outcomes.</p>
+
+  <p>The question operators actually need answered is different: <em>what conversational patterns produce bad outcomes?</em> What phrasing triggers an escalation? When does billing confusion become a churn risk? When does a repeat query signal a knowledge gap in the agent pool versus a systemic product failure?</p>
+
+  <p>Answering these questions requires reasoning across entire transcripts, not individual utterances. It requires connecting a churn signal in call 4,823 to a billing confusion pattern also present in calls 11,004, 17,390, and 22,771. It requires doing this in response to an analyst's natural-language question, in real time, with zero tolerance for fabrication.</p>
+
+  <p>This is where standard NLP pipelines and generic LLM usage both fail. A standard pipeline extracts features but cannot reason causally. A generic LLM generates plausible-sounding answers but cannot ground them in specific evidence from your corpus. You need something in between — a system with structured retrieval layered under a reasoning model.</p>
+
+  <hr class="rule">
+
+  <h2>The problem, precisely</h2>
+
+  <p>The Inter IIT challenge framed the task in two parts. The first: given a natural-language query, generate a structured causal explanation with supporting evidence from the transcript corpus. The second: extend this to multi-turn dialogue — handle follow-up questions while maintaining the context of what has already been established.</p>
+
+  <p>Both tasks share the same hard constraint: <strong>every claim must be evidentially grounded.</strong> Explaining why escalations happen by citing specific call IDs is not the same as summarising a general trend. The former is auditable. The latter is guesswork dressed as analysis.</p>
+
+  <p>The corpus available was 30M+ tokens of customer-agent dialogue, spanning six domains, with speaker labels, turn indexing, and outcome flags. No pre-labelled causal spans. No structured annotation. Raw transcripts, at scale.</p>
+
+  <div class="callout"><p><strong>The core challenge:</strong> causal triggers in conversational data are not explicit. They are distributed across turns, often expressed through absence (no resolution after three queries), repetition (the same complaint in different words), or structural patterns (escalation always follows a specific billing-explanation failure mode). Extracting them requires both a retrieval system with high coverage and a reasoning layer with high faithfulness.</p></div>
+
+  <hr class="rule">
+
+  <h2>Our approach</h2>
+
+  <p>We built a two-strategy retrieval engine. Both strategies share the same entry point — a natural-language query — and the same exit point — a streamed, grounded LLM answer. What differs is how they retrieve evidence. The choice of strategy is determined by the query type.</p>
+
+  <h3>Step 1 — Label discovery and metadata enrichment</h3>
+
+  <p>Raw transcripts carry no structured metadata. Before retrieval is possible, every call must be tagged with a domain, a topic, and an outcome. We did this in two stages to prevent a well-known failure mode: naming drift.</p>
+
+  <p>In the first stage, we sampled 40% of the corpus and sent batches to Gemini Pro with an open-ended prompt: identify the topic and outcome from this conversation. Across thousands of calls, Gemini Pro surfaced a consistent set of candidate labels — the Zipfian distribution of topics meant that 40% coverage captured the vast majority of the label space.</p>
+
+  <p>In the second stage, we fixed this schema and ran every remaining call through Gemini Flash with constrained classification — choose from this exact list of topics and outcomes. This prevented the model from coining synonyms ("Billing Dispute" vs "Bill Dispute" vs "Billing Error") and ensured every field in the metadata was deterministic and queryable.</p>
+
+  <p>Traditional NLP preprocessing — stopword removal, lemmatisation, stemming — was deliberately avoided. These transforms destroy conversational signal. Hesitations, repetitions, and informal agent phrasing are features, not noise. Stripping them degrades classification accuracy on this class of data.</p>
+
+  <h3>Step 2a — GraphRAG: knowledge graph traversal</h3>
+
+  <p>We constructed a knowledge graph from the enriched corpus. The graph has two node types: <strong>Call nodes</strong> containing the full transcript text, summary, and metadata; and <strong>Concept nodes</strong> serving as structural anchors for traversal. Edges connect calls to the topics and outcomes they instantiate.</p>
+
+  <p>When a query arrives, we embed it using <code>embeddinggemma-300m</code> (768 dimensions) and run a vector search against the graph's embedding index to find initial entry nodes. A domain filter is inferred from the query and used to restrict which Call nodes are eligible. Then graph traversal begins.</p>
+
+  <p>Three traversal modes handle different query structures:</p>
+  <ul style="font-size:15px;color:var(--grey-700);line-height:1.8;max-width:640px;padding-left:20px;margin-bottom:20px;">
+    <li><strong>Single-concept expansion:</strong> retrieve all Call nodes adjacent to a single Concept node.</li>
+    <li><strong>Multi-concept intersection:</strong> for queries involving multiple dimensions ("billing confusion AND escalation"), find Call nodes that appear in the neighbourhood of all relevant Concepts simultaneously.</li>
+    <li><strong>Shortest-path bridging:</strong> when no intersection exists, find the minimum-length path between Concept nodes and extract Calls along the path — connecting structurally related regions of the graph.</li>
+  </ul>
+
+  <p>The retrieved calls are assembled into a context block and passed to Gemini Flash, with an explicit instruction to cite Call IDs for every claim. The response is streamed back via Server-Sent Events.</p>
+
+  <h3>Step 2b — Vector RAG: hybrid prefilter search</h3>
+
+  <p>The second strategy skips the graph and queries Qdrant directly. The query is parsed by Gemini Flash into a structured search plan: a <code>search_text</code> for the embedding query, and filter conditions. Domain filters are applied as hard <code>must-match</code> conditions in Qdrant's filter API. Topic and outcome filters are applied as soft <code>should-match</code> conditions — influencing ranking without hard exclusion.</p>
+
+  <p>This produces a hybrid retrieval: the prefilter trims the search space dramatically (from 30,000 calls to hundreds or fewer), then the embedding similarity selects the most semantically relevant subset. Top-40 results are retrieved; those below a 0.4 cosine score are discarded. The surviving evidence is assembled and passed to the same LLM generation step.</p>
+
+  <h3>Step 3 — Multi-turn context</h3>
+
+  <p>Follow-up queries ("What about the telecom cases?" following a question about billing escalations) are handled by a query reformulation step. The chat history is passed to Gemini Flash with a single instruction: rewrite the latest query as a standalone search query, resolving pronouns and implicit references. This allows the retrieval step to operate statelessly while preserving conversational continuity at the application layer.</p>
+
+  <hr class="rule">
+
+  <h2>Architecture</h2>
+
+  <div class="arch">
+    <div class="arch-row"><div class="arch-box" style="max-width:340px;"><strong>Natural-language query</strong><small>+ optional chat history</small></div></div>
+    <div class="arch-arr">↓</div>
+    <div class="arch-row">
+      <div class="arch-box"><strong>Query reformulation</strong><small>Gemini 2.5 Flash · pronoun resolution</small></div>
+      <div class="arch-box"><strong>Filter inference</strong><small>Gemini 2.5 Flash · structured JSON</small></div>
+    </div>
+    <div class="arch-arr">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓</div>
+    <div class="arch-row">
+      <div class="arch-box dark"><strong>GraphRAG</strong><small>NetworkX · 88MB graph</small></div>
+      <div class="arch-box"><strong>Vector RAG</strong><small>Qdrant · embeddinggemma-300m</small></div>
+    </div>
+    <div class="arch-arr">↓</div>
+    <div class="arch-row"><div class="arch-box" style="max-width:380px;"><strong>Grounded answer + Call ID citations</strong><small>Gemini 2.5 Flash · Server-Sent Events stream</small></div></div>
+  </div>
+
+  <p>The backend is a single FastAPI application with a <code>/chat</code> endpoint that returns an SSE stream. Each event in the stream carries a typed payload: <code>status</code> (pipeline stage), <code>concepts</code> (inferred filters or graph entry nodes), <code>sources</code> (retrieved call records), and <code>token</code> (streamed LLM output). The frontend consumes these incrementally, rendering sources as cards before the full answer arrives.</p>
+
+  <hr class="rule">
+
+  <h2>Evaluation</h2>
+
+  <p>We evaluated both strategies using the RAGAS framework across three metrics. <strong>ID Recall</strong> measures whether the correct call records appear in the retrieved evidence set. <strong>Faithfulness</strong> measures whether the generated answer is supported by the retrieved evidence — a faithfulness of 1.0 means every claim is traceable to a source; 0.0 means the model fabricated. <strong>Answer Relevancy</strong> measures whether the answer addresses the question asked.</p>
+
+  <table class="eval-table">
+    <thead>
+      <tr><th>Metric</th><th>GraphRAG</th><th>Vector RAG</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Faithfulness</td><td class="best">0.74</td><td>0.58</td></tr>
+      <tr><td>ID Recall</td><td>30.8%</td><td class="best">36.0%</td></tr>
+      <tr><td>Answer Relevancy</td><td>0.71</td><td class="best">0.77</td></tr>
+    </tbody>
+  </table>
+
+  <p>The results reveal a fundamental tradeoff. GraphRAG achieves substantially higher faithfulness — 0.74 versus 0.58 — meaning its answers are more tightly grounded in the retrieved evidence and carry a significantly lower hallucination risk. This makes it the correct choice for compliance-sensitive queries, root cause analysis, and any use case where an incorrect citation has consequences.</p>
+
+  <p>Vector RAG achieves higher recall and relevancy. Because it searches by semantic similarity rather than strict graph adjacency, it surfaces a broader set of relevant calls (36% vs 30.8% recall) and produces answers that more directly address the surface-level question. For exploratory queries — "what kinds of issues appear in telecom churn calls?" — this broader coverage is an advantage.</p>
+
+  <div class="callout"><p><strong>Key finding:</strong> neither strategy is universally superior. A production deployment would route compliance and root-cause queries to GraphRAG and general information retrieval to Vector RAG. The routing decision can itself be made by a lightweight query classifier.</p></div>
+
+  <hr class="rule">
+
+  <h2>What we achieved</h2>
+
+  <p>This is what the system is capable of doing, against a corpus no existing tool was processing analytically before:</p>
+
+  <ul style="font-size:15px;color:var(--grey-700);line-height:1.85;max-width:640px;padding-left:20px;margin-bottom:24px;">
+    <li>Answer the question <em>"Why are escalations happening in banking calls?"</em> with citations to specific call IDs and quoted transcript spans.</li>
+    <li>Perform multi-hop reasoning: "What connects fraud reports in insurance to churn signals in telecom?" — finding shared structural patterns via shortest-path graph traversal.</li>
+    <li>Sustain multi-turn dialogue: follow-up questions maintain context without reprocessing the entire history.</li>
+    <li>Operate at 30M+ token scale with sub-10-second response latency via streaming.</li>
+    <li>Achieve faithfulness scores competitive with purpose-built RAG systems, without any fine-tuning of the underlying LLM.</li>
+  </ul>
+
+  <p>The system is fully containerised. A single <code>docker compose up</code> starts the FastAPI backend with the knowledge graph pre-loaded and Qdrant initialised. The frontend is a static HTML/JS client that connects to the <code>/chat</code> SSE endpoint and renders evidence sources in real time.</p>
+
+  <hr class="rule">
+
+  <h2>Limitations and future work</h2>
+
+  <p>GraphRAG is brittle when initial entity resolution fails. If the embedding search does not find a relevant Concept node as an entry point — because the query uses phrasing not represented in the graph's vocabulary — traversal never begins, and the answer falls back to the evidence found by direct vector search on Call nodes alone. Improving robustness here, through synonym expansion or a more capable entity linker, is the most important near-term improvement.</p>
+
+  <p>The current graph was built from a static corpus snapshot. In a production system the graph would need to be incrementally updated as new calls arrive — a non-trivial engineering challenge that requires either periodic re-indexing or an online graph update protocol.</p>
+
+  <p>Finally, the evaluation framework, while rigorous, was constrained by the absence of a gold-standard causal annotation set. ID Recall is measured against a synthetically constructed ground truth. A purpose-built evaluation dataset, with human-annotated causal span labels, would allow much more precise measurement of the system's core capability.</p>
+
+  <hr class="rule">
+
+  <p style="font-size:13px;color:var(--grey-400);">CausewayAI &mdash; Inter IIT Tech Meet 2026 &mdash; <a href="https://github.com/Aarchi-07/CausewayAI" target="_blank">github.com/Aarchi-07/CausewayAI</a></p>
+
+</main>
+
+<script>
+// Animate eval table bars on scroll
+const bars = document.querySelectorAll('.tbar');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.style.width = e.target.dataset.w+'%'; io.unobserve(e.target); }});
+}, {threshold:0.3});
+bars.forEach(b => io.observe(b));
+</script>
+</body>
+</html>
